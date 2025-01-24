@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Typing System</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .output {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border: 1px solid #ddd;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: scroll;
+        }
+        .start-btn {
+            margin-top: 20px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        <h1>Voice Typing System</h1>
+        <p>Click the button below and start speaking!</p>
+        <button class="btn btn-primary start-btn" id="startBtn">Start Dictating</button>
+        <div class="output" id="outputText"></div>
+    </div>
+
+    <script>
+        // Checking if the browser supports SpeechRecognition
+        var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        var recognition = new SpeechRecognition();
+
+        // Getting elements from the DOM
+        var outputText = document.getElementById('outputText');
+        var startBtn = document.getElementById('startBtn');
+
+        // Set up recognition properties
+        recognition.lang = 'en-US';
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        // Start the voice recognition when the button is clicked
+        startBtn.addEventListener('click', function () {
+            recognition.start();
+            startBtn.disabled = true;
+            startBtn.textContent = 'Listening...';
+        });
+
+        // Event listener for when speech recognition starts
+        recognition.onstart = function () {
+            console.log("Voice recognition started");
+        };
+
+        // Event listener for when speech recognition results are returned
+        recognition.onresult = function (event) {
+            var transcript = "";
+            var interimTranscript = "";
+
+            for (var i = event.resultIndex; i < event.results.length; i++) {
+                var result = event.results[i];
+                if (result.isFinal) {
+                    transcript += result[0].transcript;
+                } else {
+                    interimTranscript += result[0].transcript;
+                }
+            }
+
+            // Display the transcript and interim result
+            outputText.innerHTML = transcript + "<i style='color: gray;'> " + interimTranscript + "</i>";
+        };
+
+        // Event listener for when speech recognition ends
+        recognition.onend = function () {
+            console.log("Voice recognition ended");
+            startBtn.disabled = false;
+            startBtn.textContent = 'Start Dictating';
+        };
+
+        // Event listener for errors
+        recognition.onerror = function (event) {
+            console.error("Speech recognition error:", event.error);
+            startBtn.disabled = false;
+            startBtn.textContent = 'Start Dictating';
+        };
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
